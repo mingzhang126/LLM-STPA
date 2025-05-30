@@ -1,5 +1,5 @@
-# LLM-STPA
-A new form of STPA analysis tool
+# LLM-STPA: A new form of STPA analysis tool
+
 ![teaser](code/main_page.png)
 
 
