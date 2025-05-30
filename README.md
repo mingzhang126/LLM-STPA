@@ -3,6 +3,6 @@
 ![teaser](code/main_page.png)
 
 
-# To be update 
+# To be updated 
 Open stpa.py and run.
 	
