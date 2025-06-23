@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}SynSTPA:A new tool for STPA analyse - {{ t.home }}{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4 mb-3">{{ t.welcome_message }}</h1>
+    <p class="lead text-muted">{{ t.system_theoretic_process_analysis }}</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class='bx bx-edit-alt'></i> {{ t.system_description }}
+                </h2>
+                <form method="POST" action="/">
+                    <div class="mb-4">
+                        <label for="system_description" class="form-label">{{ t.enter_system_description }}</label>
+                        <textarea class="form-control" id="system_description" name="system_description" rows="6" placeholder="{{ t.system_description_placeholder }}">{{ system_description }}</textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" onclick="fillExample()">
+                            <i class='bx bx-file'></i> {{ t.fill_example }}
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class='bx bx-right-arrow-alt'></i> {{ t.start_analysis }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger mt-4" role="alert">
+            <i class='bx bx-error-circle'></i> {{ error }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fillExample() {
+    const example = `自动驾驶单车道巡航SLP系统
+- 主要功能：实现车辆的单车道巡航功能。
+- 关键组件：驾驶员、传感器(各类车身传感器、驾驶员状态监测、激光雷达、摄像头、毫米波雷达)、刹车、方向盘、HMI交互系统、SLP单车道巡航控制器、最小风险控制器（SLP控制器失效时接管SLP功能）被控车辆、环境。
+- 运行环境：城市道路。`;
+    document.getElementById('system_description').value = example;
+}
+</script>
+{% endblock %}

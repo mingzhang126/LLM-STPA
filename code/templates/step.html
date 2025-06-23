@@ -1,0 +1,743 @@
+{% extends "base.html" %}
+
+{% block title %}SynSTPA:A new tool for STPA analyse  - 步骤 {{ step }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="step-number me-3">
+        <span class="badge bg-primary rounded-circle p-4" style="font-size: 2.0rem; min-width: 3.5rem; height: 4.0rem; display: flex; align-items: center; justify-content: center;">{{ step }}</span>
+    </div>
+    <div>
+        <h1 class="mb-1">{{ step_name }}</h1>
+        <p class="text-muted mb-0">{{ step_desc }}</p>
+    </div>
+</div>
+
+<form method="POST" action="/step/{{ step }}" id="step-form">
+    <!-- 选项 -->
+    {% if step != 1 %}
+    <div class="mb-4">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="include_table" name="include_table" {% if include_table or step in [2, 3, 4, 5, 6] %}checked{% endif %}>
+            <label class="form-check-label" for="include_table">
+                <i class='bx bx-table'></i> {{ t.generate_table }}
+            </label>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 步骤 2：添加自定义控制行为表单 -->
+    {% if step == 2 %}
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <i class='bx bx-plus-circle'></i> {{ t.add_custom_control_action }}
+        </h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="custom_control_action" class="form-label">{{ t.control_action }}</label>
+                        <input type="text" class="form-control" id="custom_control_action" name="custom_control_action" placeholder="{{ t.control_action_placeholder }}" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="custom_from" class="form-label">{{ t.from_entity }}</label>
+                        <input type="text" class="form-control" id="custom_from" name="custom_from" placeholder="{{ t.from_entity_placeholder }}" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="custom_to" class="form-label">{{ t.to_entity }}</label>
+                        <input type="text" class="form-control" id="custom_to" name="custom_to" placeholder="{{ t.to_entity_placeholder }}" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="custom_condition" class="form-label">{{ t.condition }}</label>
+                        <input type="text" class="form-control" id="custom_condition" name="custom_condition" placeholder="{{ t.condition_placeholder }}" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" name="action" value="add_custom_control_action">
+                    <i class='bx bx-plus'></i> {{ t.add_control_action }}
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 分析结果 -->
+    <div class="mb-4">
+        <label for="result" class="form-label">
+            <i class='bx bx-edit'></i> {{ t.analysis_results }}
+        </label>
+        <textarea class="form-control" id="result" name="result" rows="2" placeholder="......">{{ result }}</textarea>
+    </div>
+
+   <!-- 生成分析按钮 -->
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <i class='bx bx-analyse'></i> {{ t.generate_analysis }}
+        </h3>
+        <div class="d-flex gap-3">
+            {% if step == 1 %}
+                <button type="submit" class="btn btn-success" name="action" value="generate_losses" id="generate-losses-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_losses }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+                <button type="submit" class="btn btn-success" name="action" value="generate_hazards" id="generate-hazards-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_hazards }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+                <button type="submit" class="btn btn-success" name="action" value="generate_safety_constraints" id="generate-constraints-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_safety_constraints }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            {% elif step == 2 %}
+                <button type="submit" class="btn btn-success" name="action" value="generate" id="generate-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_control_architecture }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            {% elif step == 3 %}
+                <button type="submit" class="btn btn-success" name="action" value="generate" id="generate-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_unsafe_control_actions }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            {% elif step == 4 %}
+                <button type="submit" class="btn btn-success" name="action" value="generate" id="generate-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_first_hara }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            {% elif step == 5 %}
+                <button type="submit" class="btn btn-success" name="action" value="generate" id="generate-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_first_causal }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            {% elif step == 6 %}
+                <button type="submit" class="btn btn-success" name="action" value="generate" id="generate-btn">
+                    <i class='bx bx-plus-circle'></i> {{ t.generate_safety_requirements }}
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 步骤 1：Losses 表格 -->
+    {% if step == 1 and losses %}
+        <div class="mb-4">
+            <h3 class="mb-3">
+                <i class='bx bx-error'></i> {{ t.losses_title }}
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Loss ID</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in losses %}
+                            <tr data-bs-toggle="collapse" data-bs-target="#loss-details-{{ row.id }}" class="accordion-toggle">
+                                <td><span class="badge bg-primary">{{ row.id }}</span></td>
+                                <td>{{ row.description }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="p-0">
+                                    <div class="collapse" id="loss-details-{{ row.id }}">
+                                        <div class="p-3 bg-light">
+                                            <i class='bx bx-info-circle'></i> {{t.detailed_results}}:{{ row.description }}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 步骤 1：Hazards 表格 -->
+    {% if step == 1 and hazards %}
+        <div class="mb-4">
+            <h3 class="mb-3">
+                <i class='bx bx-error-circle'></i> {{ t.hazards_title }}
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Hazard ID</th>
+                            <th>Description</th>
+                            <th>Linked Losses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in hazards %}
+                            <tr data-bs-toggle="collapse" data-bs-target="#hazard-details-{{ row.id }}" class="accordion-toggle">
+                                <td><span class="badge bg-danger">{{ row.id }}</span></td>
+                                <td>{{ row.description }}</td>
+                                <td>
+                                    {% for loss in row.linked_losses %}
+                                        <span class="badge bg-secondary me-1">{{ loss }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="p-0">
+                                    <div class="collapse" id="hazard-details-{{ row.id }}">
+                                        <div class="p-3 bg-light">
+                                            <i class='bx bx-info-circle'></i> {{t.detailed_results}}：{{ row.description }}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 步骤 1：Safety Constraints 表格 -->
+    {% if step == 1 and safety_constraints %}
+        <div class="mb-4">
+            <h3 class="mb-3">
+                <i class='bx bx-shield-quarter'></i> {{ t.safety_constraints_title }}
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Safety Constraints ID</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in safety_constraints %}
+                            <tr data-bs-toggle="collapse" data-bs-target="#constraint-details-{{ row.id }}" class="accordion-toggle">
+                                <td><span class="badge bg-success">{{ row.id }}</span></td>
+                                <td>{{ row.description }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="p-0">
+                                    <div class="collapse" id="constraint-details-{{ row.id }}">
+                                        <div class="p-3 bg-light">
+                                            <i class='bx bx-info-circle'></i> {{t.detailed_results}}：{{ row.description }}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+    <!-- 步骤 4：继续分析按钮 -->
+    {% if step == 4 %}
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <i class='bx bx-refresh'></i> {{ t.continue_analysis }}
+        </h3>
+        <div class="d-flex gap-3 align-items-center">
+            <button type="submit" class="btn btn-primary" name="action" value="continue_analysis" id="continue-analysis-btn">
+                <i class='bx bx-right-arrow-circle'></i> {{ t.continue_next_batch }}
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
+            <div class="progress flex-grow-1" style="height: 8px;">
+                <div class="progress-bar" role="progressbar" data-width="{{ (next_batch_start|default(0) / total_items|default(1) * 100)|round }}"></div>
+            </div>
+            <span class="text-muted">({{ next_batch_start|default(0) }}/{{ total_items|default(0) }})</span>
+            <input type="hidden" name="batch_start" value="{{ next_batch_start|default(0) }}">
+            <input type="hidden" name="batch_size" value="{{ batch_size|default(5) }}">
+        </div>
+    </div>
+    {% endif %}
+    {% if step == 5 %}
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <i class='bx bx-refresh'></i> {{t.continue_analysis}}
+        </h3>        
+        <div class="d-flex gap-3 align-items-center">
+            <button type="submit" class="btn btn-primary" name="action" value="continue_analysis" id="continue-analysis-btn">
+                <i class='bx bx-right-arrow-circle'></i> {{ t.continue_next_batch }}
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
+            <button type="button" class="btn btn-success" id="auto-analysis-btn">
+                <i class='bx bx-play-circle'></i> {{ t.auto_analyze }}
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
+            <button type="button" class="btn btn-danger d-none" id="stop-analysis-btn">
+                <i class='bx bx-stop-circle'></i> {{ t.stop_analysis }}
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
+            <div class="progress flex-grow-1" style="height: 8px;">
+                <div class="progress-bar" role="progressbar" data-width="{{ (next_batch_start|default(0) / total_items|default(1) * 100)|round }}"></div>
+            </div>
+            <span class="text-muted">({{ next_batch_start|default(0) }}/{{ total_items|default(0) }})</span>
+            <input type="hidden" name="batch_start" value="{{ next_batch_start|default(0) }}">
+            <input type="hidden" name="batch_size" value="{{ batch_size|default(1) }}">
+            <input type="hidden" name="is_auto_analysis" value="false">
+        </div>
+    </div>
+    {% endif %}
+    <!-- 其他步骤的表格 -->
+    {% if table and step in [2, 3, 4, 5, 6] %}
+        <div class="mb-4">
+            <h3 class="mb-3">
+                {% if step == 2 %}
+                    <i class='bx bx-network-chart'></i> {{ t.control_structure }}
+                {% elif step == 3 %}
+                    <i class='bx bx-error'></i> {{ t.unsafe_control_behaviors }}
+                {% elif step == 4 %}
+                    <i class='bx bx-analyse'></i> {{ t.hazard_evaluation }}
+                {% elif step == 5 %}
+                    <i class='bx bx-search-alt'></i> {{ t.causal_factor_analysis }}
+                {% else %}
+                    <i class='bx bx-list-check'></i> {{ t.safety_requirements }}
+                {% endif %}
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            {% if step == 2 %}
+                                <th>CA ID</th>
+                                <th>{{ t.control_action }}</th>
+                                <th>{{ t.from_entity }}</th>
+                                <th>{{ t.to_entity }}</th>
+                                <th>{{ t.condition }}</th>
+                            {% elif step == 3 %}
+                                <th>ID</th>
+                                <th>{{ t.control_action }}</th>
+                                <th>{{ t.cannot_provide }}</th>
+                                <th>{{ t.provide }}</th>
+                                <th>{{ t.wrong_moment }}</th>
+                                <th>{{ t.sustained_abnormal }}</th>
+                            {% elif step == 4 %}
+                                <th>ID</th>
+                                <th>Control action</th>
+                                <th>UCAs</th>
+                                <th>Hazard</th>
+                                <th>Scene Desc.</th>
+                                <th>Potential effect</th>
+                                <th>severity</th>
+                                <th>Severity Desc.</th>
+                                <th>controllability</th>
+                                <th>controllability Desc.</th>
+                                <th>Accepted</th>
+                            {% elif step == 5 %}                                
+                                <th>ID</th>
+                                <th>misuse_scenario</th>
+                                <th>Correlation effect</th>
+                                <th>stakeholders</th>
+                                <th>Yes/No Analysis</th>
+                                <th>Reason</th>
+                                <th>Identify performance defects/human misuse</th>
+                                <th>Misuse process</th>
+                                <th>Guide words</th>
+                                <th>Casual factor</th>
+                                <th>Requirements</th>
+                            {% else %}
+                                <th>SR_ID</th>
+                                <th>Safety Requirements</th>
+                                <th>TC_ID</th>
+                                <th>Trigger Condition</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in table %}
+                            <tr data-bs-toggle="collapse" data-bs-target="#details-{{ row.id }}" class="accordion-toggle">
+                                {% if step == 2 %}
+                                    <td><span class="badge bg-primary">{{ row.id }}</span></td>
+                                    <td>{{ row.control_action }}</td>
+                                    <td>{{ row.from }}</td>
+                                    <td>{{ row.to }}</td>
+                                    <td>{{ row.condition }}</td>
+                                {% elif step == 3 %}
+                                    <td><span class="badge bg-danger">{{ row.id }}</span></td>
+                                    <td>{{ row.control_action }}</td>
+                                    <td>{{ row.cant_providing }}</td>
+                                    <td>{{ row.providing }}</td>
+                                    <td>{{ row.wrong_moment }}</td>
+                                    <td>{{ row.sustained_abnormal }}</td>
+                                {% elif step == 4 %}
+                                    <td><span class="badge bg-warning text-dark">{{ row.id }}</span></td>
+                                    <td>{{ row.control_action }}</td>
+                                    <td>{{ row.uca }}</td>
+                                    <td>{{ row.hazard }}</td>
+                                    <td>{{ row.scenario }}</td>
+                                    <td>{{ row.impact }}</td>
+                                    <td>{{ row.severity }}</td>
+                                    <td>{{ row.severity_desc }}</td>
+                                    <td>{{ row.controllability }}</td>
+                                    <td>{{ row.controllability_desc }}</td>
+                                    <td>
+                                        {% if row.accepted == '是' %}
+                                            <span class="badge bg-success">{{t.yes}}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{t.no}}</span>
+                                        {% endif %}
+                                    </td>
+                                {% elif step == 5 %}
+                                    <td><span class="badge bg-info">{{ row.id }}</span></td>
+                                    <td>{{ row.misuse_scenario }}</td>
+                                    <td>{{ row.impact }}</td>
+                                    <td>{{ row.stakeholder }}</td>
+                                    <td>
+                                        {% if row.is_analyzed %}
+                                            <span class="badge bg-success">{{t.yes}}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{t.no}}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ row.analysis_reason }}</td>
+                                    <td>{{ row.defect_or_misuse }}</td>
+                                    <td>{{ row.misuse_process }}</td>
+                                    <td>{{ row.guide_word }}</td>
+                                    <td>{{ row.causal_factor }}</td>
+                                    <td>{{ row.requirement }}</td>
+                                {% else %}
+                                    <td><span class="badge bg-success">{{ row.id }}</span></td>
+                                    <td>{{ row.safety_req }}</td>
+                                    <td><span class="badge bg-info">{{ row.tc_id }}</span></td>
+                                    <td>{{ row.trigger_condition }}</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td colspan="{% if step == 3 %}6{% elif step == 4 %}11{% elif step == 5 %}11{% elif step == 2 %}5{% else %}4{% endif %}" class="p-0">
+                                    <div class="collapse" id="details-{{ row.id }}">
+                                        <div class="p-3 bg-light">
+                                            <i class='bx bx-info-circle'></i> {{t.detailed_results}} :
+                                            {% if step == 2 %}
+                                                {{ row.control_action }} - {{t.from_entity}}：{{ row.from }}，{{t.to_entity}}：{{ row.to }}，{{t.condition}}：{{ row.condition }}
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="{{ row.id }}" onclick="deleteControlAction('{{ row.id }}')">
+                                                        <i class='bx bx-trash'></i>{{t.delete}}
+                                                    </button>
+                                                </div>
+                                            {% elif step == 3 %}
+                                                {{ row.control_action }} - {{t.cannot_provide}}：{{ row.cant_providing }}，{{t.provide}}：{{ row.providing }}，{{t.wrong_moment}}：{{ row.wrong_moment }}，{{t.sustained_abnormal}}：{{ row.sustained_abnormal }}
+                                            {% elif step == 4 %}
+                                                {{ row.control_action }} - {{ row.uca }} - {{ row.hazard }} - {{ row.scenario }} - {{ row.impact }}
+                                            {% elif step == 5 %}
+                                                {{ row.misuse_scenario }} - {{ row.impact }} - {{ row.stakeholder }} - {{ row.defect_or_misuse }} - {{ row.misuse_process }} - {{ row.guide_word }} - {{ row.causal_factor }} - {{ row.requirement }}
+                                            {% else %}
+                                                {{ row.safety_req }} - {{ row.trigger_condition }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 保存按钮 -->
+    <div class="d-flex justify-content-end gap-3">
+        <button type="submit" class="btn btn-primary" name="action" value="save">
+            <i class='bx bx-save'></i> {{ t.save }}
+        </button>
+        {% if step > 1 %}
+            <a href="/step/{{ step - 1 }}" class="btn btn-secondary">
+                <i class='bx bx-left-arrow-alt'></i> {{ t.previous_step }}
+            </a>
+        {% endif %}
+        {% if step < 6 %}
+            <a href="/step/{{ step + 1 }}" class="btn btn-secondary">
+                {{ t.next_step }} <i class='bx bx-right-arrow-alt'></i>
+            </a>
+        {% endif %}
+        {% if step == 6 %}
+            <a href="#" class="btn btn-success" id="view-results-btn">
+                <i class='bx bx-check-circle'></i> {{ t.analysis_results }}
+                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 设置进度条宽度
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        const width = progressBar.getAttribute('data-width');
+        progressBar.style.width = width + '%';
+    }
+    // 自动分析相关代码
+    const autoAnalysisBtn = document.getElementById('auto-analysis-btn');
+    const stopAnalysisBtn = document.getElementById('stop-analysis-btn');
+    const continueAnalysisBtn = document.getElementById('continue-analysis-btn');
+    let isAutoAnalyzing = false;
+    let analysisInterval;
+
+    if (autoAnalysisBtn && stopAnalysisBtn) {
+        autoAnalysisBtn.addEventListener('click', function() {
+            isAutoAnalyzing = true;
+            autoAnalysisBtn.classList.add('d-none');
+            stopAnalysisBtn.classList.remove('d-none');
+            continueAnalysisBtn.classList.add('d-none');
+            
+            // 开始自动分析
+            startAutoAnalysis();
+        });
+
+        stopAnalysisBtn.addEventListener('click', function() {
+            isAutoAnalyzing = false;
+            stopAnalysisBtn.classList.add('d-none');
+            autoAnalysisBtn.classList.remove('d-none');
+            continueAnalysisBtn.classList.remove('d-none');
+            
+            // 停止自动分析
+            clearInterval(analysisInterval);
+        });
+    }
+    function startAutoAnalysis() {
+        const autoAnalysisBtn = document.getElementById('auto-analysis-btn');
+        const autoSpinner = autoAnalysisBtn.querySelector('.spinner-border');
+        if (autoSpinner) {
+            autoSpinner.classList.remove('d-none');
+        }
+        // 立即执行一次分析
+        submitAnalysis();
+    }
+    function submitAnalysis() {
+        const form = document.querySelector('form');
+        const submitBtn = form.querySelector('button[value="continue_analysis"]');
+        const spinner = submitBtn.querySelector('.spinner-border');
+        const isAutoAnalysisInput = form.querySelector('input[name="is_auto_analysis"]');
+        
+        // 显示加载动画
+        spinner.classList.remove('d-none');
+        submitBtn.disabled = true;
+        // 设置自动分析标志
+        isAutoAnalysisInput.value = isAutoAnalyzing ? "true" : "false";
+        // 获取正确的URL路径
+        const currentStepPath = window.location.pathname;
+        // 创建一个新的FormData对象
+        const formData = new FormData(form);
+        // 确保action参数正确设置
+        formData.set('action', 'continue_analysis');
+        // 提交表单
+        fetch(currentStepPath, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('收到服务器数据:', data); // 添加调试日志
+                // 更新表格内容
+                const tableContainer = document.querySelector('.table-responsive');
+                if (tableContainer && data.table && data.table.length > 0) {
+                    console.log('更新表格数据:', data.table.length, '条记录');
+                    // 更新表格内容
+                    updateTableContent(data.table);
+                } else {
+                    console.warn('没有收到表格数据或表格为空');
+                }
+                
+                // 更新进度条
+                const progressBar = document.querySelector('.progress-bar');
+                if (progressBar && data.next_batch_start !== undefined && data.total_items !== undefined) {
+                    const progress = (data.next_batch_start / data.total_items * 100).toFixed(0);
+                    console.log('更新进度条:', progress + '%', data.next_batch_start, '/', data.total_items);
+                    progressBar.style.width = progress + '%';
+                    
+                    // 更新进度文本
+                    const progressText = document.querySelector('.text-muted');
+                    if (progressText) {
+                        progressText.textContent = `(${data.next_batch_start}/${data.total_items})`;
+                    }
+                    
+                    // 更新隐藏字段
+                    const batchStartInput = document.querySelector('input[name="batch_start"]');
+                    if (batchStartInput) {
+                        batchStartInput.value = data.next_batch_start;
+                    }
+                } else {
+                    console.warn('进度数据不完整:', data.next_batch_start, data.total_items);
+                }
+                
+                // 更新结果文本框
+                if (data.result) {
+                    const resultTextarea = document.getElementById('result');
+                    if (resultTextarea) {
+                        resultTextarea.value = data.result;
+                    }
+                }
+                
+                // 如果还有更多内容需要分析且处于自动分析模式，继续分析
+                if (data.has_more && isAutoAnalyzing) {
+                    setTimeout(submitAnalysis, 3000); // 3秒后继续分析
+                } else {
+                    // 分析完成或停止，恢复按钮状态
+                    isAutoAnalyzing = false;
+                    stopAnalysisBtn.classList.add('d-none');
+                    autoAnalysisBtn.classList.remove('d-none');
+                    continueAnalysisBtn.classList.remove('d-none');
+                }
+            } else {
+                console.error('分析失败:', data.error);
+                // 发生错误，停止自动分析
+                isAutoAnalyzing = false;
+                stopAnalysisBtn.classList.add('d-none');
+                autoAnalysisBtn.classList.remove('d-none');
+                continueAnalysisBtn.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('分析请求失败:', error);
+            // 发生错误，停止自动分析
+            isAutoAnalyzing = false;
+            stopAnalysisBtn.classList.add('d-none');
+            autoAnalysisBtn.classList.remove('d-none');
+            continueAnalysisBtn.classList.remove('d-none');
+        })
+        .finally(() => {
+            // 隐藏加载动画
+            spinner.classList.add('d-none');
+            submitBtn.disabled = false;
+        });
+    }
+    function updateTableContent(tableData) {
+        const tableContainer = document.querySelector('.table-responsive');
+        if (!tableContainer) return;
+
+        const table = tableContainer.querySelector('table');
+        if (!table) return;
+
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        // 清空现有内容
+        tbody.innerHTML = '';
+
+        // 添加新内容
+        tableData.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-bs-toggle', 'collapse');
+            tr.setAttribute('data-bs-target', `#details-${row.id}`);
+            tr.className = 'accordion-toggle';
+
+            // 添加单元格
+            const cells = [
+                `<span class="badge bg-info">${row.id}</span>`,
+                row.misuse_scenario,
+                row.impact,
+                row.stakeholder,
+                `<span class="badge ${row.is_analyzed ? 'bg-success' : 'bg-danger'}">${row.is_analyzed ? '是' : '否'}</span>`,
+                row.analysis_reason,
+                row.defect_or_misuse,
+                row.misuse_process,
+                row.guide_word,
+                row.causal_factor,
+                row.requirement
+            ];
+
+            cells.forEach(cell => {
+                const td = document.createElement('td');
+                td.innerHTML = cell;
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+
+            // 添加详情行
+            const detailTr = document.createElement('tr');
+            const detailTd = document.createElement('td');
+            detailTd.colSpan = 11;
+            detailTd.className = 'p-0';
+            detailTd.innerHTML = `
+                <div class="collapse" id="details-${row.id}">
+                    <div class="p-3 bg-light">
+                        <i class='bx bx-info-circle'></i> 详细说明：
+                        ${row.misuse_scenario} - ${row.impact} - ${row.stakeholder} - ${row.defect_or_misuse} - ${row.misuse_process} - ${row.guide_word} - ${row.causal_factor} - ${row.requirement}
+                    </div>
+                </div>
+            `;
+            detailTr.appendChild(detailTd);
+            tbody.appendChild(detailTr);
+        });
+    }
+    // 为所有可折叠行添加点击事件
+    document.querySelectorAll('.accordion-toggle').forEach(row => {
+        row.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-bs-target');
+            const target = document.querySelector(targetId);
+            const icon = this.querySelector('i');
+            
+            if (target.classList.contains('show')) {
+                if (icon) icon.classList.remove('bx-chevron-up');
+                if (icon) icon.classList.add('bx-chevron-down');
+            } else {
+                if (icon) icon.classList.remove('bx-chevron-down');
+                if (icon) icon.classList.add('bx-chevron-up');
+            }
+        });
+    });
+    // 为所有生成按钮添加点击事件监听器
+    document.querySelectorAll('button[name="action"]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            // 显示加载动画
+            const spinner = this.querySelector('.spinner-border');
+            if (spinner) {
+                spinner.classList.remove('d-none');
+            }
+            // 禁用按钮
+            this.disabled = true;
+            // 确保表单提交时包含正确的 action 值
+            const form = document.getElementById('step-form');
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = this.value;
+            form.appendChild(actionInput);
+            // 提交表单
+            form.submit();
+        });
+    });
+    // 为“查看最终结果”按钮添加点击事件
+    const viewResultsBtn = document.getElementById('view-results-btn');
+    if (viewResultsBtn) {
+        viewResultsBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // 阻止默认导航
+            const spinner = this.querySelector('.spinner-border');
+            if (spinner) {
+                spinner.classList.remove('d-none');
+            }
+            this.classList.add('disabled'); // 禁用按钮
+            const form = document.getElementById('step-form');
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'results';
+            form.appendChild(actionInput);
+            form.submit();
+        });
+    }
+});
+    // 添加删除控制行为的函数
+function deleteControlAction(id) {
+    if (confirm('确定要删除此控制行为吗？')) {
+        const form = document.getElementById('step-form');
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete_custom_control_action';
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'control_action_id';
+        idInput.value = id;
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
+        form.submit();
+    }
+}
+
+</script>
+{% endblock %}

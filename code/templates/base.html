@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="{{ session.lang or 'zh-CN' }}">
+<head>
+    <!-- 基本元数据设置 -->
+    <meta charset="UTF-8"> <!-- 设置文档字符编码为UTF-8，支持各种语言字符 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 响应式设计，确保在移动设备上正确显示 -->
+    
+    <!-- 页面标题，使用Jinja2模板引擎的块结构，允许子模板覆盖 -->
+    <title>{% block title %}SynSTPA:A new tool for STPA analyse{% endblock %}</title>
+    
+    <!-- 外部CSS库引入 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap 5框架样式 -->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet"> <!-- Boxicons图标库 -->
+    
+    <!-- 自定义CSS样式表引入，使用Flask的url_for函数生成静态文件URL -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* CSS变量定义 - 集中管理颜色方案，便于全局修改 */
+        :root {
+            --primary-color: #2c3e50;    /* 主要颜色 - 深蓝灰色，用于主要元素如导航栏背景 */
+            --secondary-color: #34495e;   /* 次要颜色 - 稍浅的蓝灰色，用于渐变和次要元素 */
+            --accent-color: #3498db;      /* 强调颜色 - 蓝色，用于高亮和交互元素 */
+            --text-color: #2c3e50;        /* 文本颜色 - 深色，确保良好的可读性 */
+            --light-bg: #f8f9fa;          /* 浅色背景 - 几乎是白色的灰色，用于页面背景 */
+        }
+        
+        /* 基本页面样式 */
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; /* 现代无衬线字体族，按优先级排列 */
+            color: var(--text-color);     /* 使用变量定义的文本颜色 */
+            background-color: var(--light-bg); /* 使用变量定义的背景颜色 */
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important; /* 从左到右的渐变背景，!important确保覆盖Bootstrap默认样式 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 轻微阴影效果，增加深度感 */
+        }
+
+        /* 导航栏品牌/标志样式 */
+        .navbar-brand {
+            font-weight: 600;   /* 半粗体文字 */
+            font-size: 2rem;  /* 增大字体大小 */
+        }
+
+        /* 侧边栏列表项样式 */
+        .list-group-item {
+            border: none;                  /* 移除默认边框 */
+            margin-bottom: 0.8rem;         /* 项目间距 */
+            border-radius: 8px !important; /* 圆角效果，!important确保覆盖Bootstrap默认样式 */
+            transition: all 0.3s ease;     /* 平滑过渡效果，用于悬停动画 */
+        }
+
+        /* 列表项悬停效果 */
+        .list-group-item:hover {
+            background-color: var(--light-bg); /* 悬停时背景色变化 */
+            transform: translateX(5px);        /* 悬停时向右移动5像素，创建动态效果 */
+        }
+
+        /* 活动列表项样式 */
+        .list-group-item.active {
+            background-color: var(--accent-color);  /* 活动项使用强调色背景 */
+            border-color: var(--accent-color);      /* 边框颜色匹配背景 */
+        }
+
+        /* 卡片样式 */
+        .card {
+            border: none;                      /* 移除默认边框 */
+            border-radius: 12px;               /* 较大的圆角 */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* 轻微阴影效果，增加深度感 */
+        }
+
+        /* 按钮基本样式 */
+        .btn {
+            border-radius: 8px;           /* 圆角按钮 */
+            padding: 0.5rem 1.2rem;       /* 内边距，使按钮更宽松 */
+            font-weight: 500;             /* 中等粗细字体 */
+            transition: all 0.3s ease;    /* 平滑过渡效果，用于悬停动画 */
+        }
+
+        /* 主要按钮样式 */
+        .btn-primary {
+            background-color: var(--accent-color); /* 使用强调色作为背景 */
+            border-color: var(--accent-color);     /* 边框颜色匹配背景 */
+        }
+
+        /* 主要按钮悬停效果 */
+        .btn-primary:hover {
+            background-color: #2980b9;        /* 悬停时背景色变深 */
+            border-color: #2980b9;            /* 边框颜色匹配新背景 */
+            transform: translateY(-2px);      /* 上移2像素，创建"浮起"效果 */
+        }
+
+        /* 表单控件样式 */
+        .form-control {
+            border-radius: 8px;               /* 圆角输入框 */
+            border: 1px solid #e0e0e0;        /* 浅灰色边框 */
+            padding: 0.75rem;                 /* 内边距，使输入框更宽松 */
+        }
+
+        /* 表单控件聚焦效果 */
+        .form-control:focus {
+            border-color: var(--accent-color);                /* 聚焦时边框使用强调色 */
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25); /* 轻微发光效果 */
+        }
+
+        /* 表格样式 */
+        .table {
+            border-radius: 12px;               /* 圆角表格 */
+            overflow: hidden;                  /* 确保内容不超出圆角边界 */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* 轻微阴影效果 */
+        }
+
+        /* 表格头部样式 */
+        .table thead th {
+            background-color: var(--primary-color); /* 表头使用主要颜色 */
+            color: white;                          /* 白色文本，确保在深色背景上可读 */
+            border: none;                          /* 移除默认边框 */
+            padding: 1rem;                         /* 增加内边距，使表头更突出 */
+        }
+
+        /* 表格单元格样式 */
+        .table tbody td {
+            padding: 1rem;                /* 增加内边距，改善可读性 */
+            vertical-align: middle;       /* 内容垂直居中 */
+        }
+
+        /* 警告框样式 */
+        .alert {
+            border-radius: 12px;               /* 圆角警告框 */
+            border: none;                      /* 移除默认边框 */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* 轻微阴影效果 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 - 使用Bootstrap的导航组件，深色主题 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container"> <!-- Bootstrap容器，提供响应式宽度和居中内容 -->
+            <a class="navbar-brand" href="/"> <!-- 网站标志/品牌，链接到首页 -->
+                <i class='bx bx-analyse'></i> SynSTPA: {{ t.system_theoretic_process_analysis }}
+            </a>
+            <div class="dropdown" id="reflink">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ t.reference_link }}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="https://psas.scripts.mit.edu/home/mit-stamp-workshop-tutorials/" target="_blank">{{ t.mit_workshop_website }}</a></li>
+                    <li><a class="dropdown-item" href="https://github.com" target="_blank">{{ t.github_project }}</a></li>
+                </ul>
+            </div>
+            <div class="dropdown" id="language-switch">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ t.language }}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('set_language', lang='zh') }}">{{ t.chinese }}</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('set_language', lang='en') }}">{{ t.english }}</a></li>
+                </ul>
+            </div>
+        </div>
+        
+    </nav>
+
+    <!-- 主内容区域 - 使用Bootstrap网格系统进行布局 -->
+    <div class="container mt-4"> <!-- 容器带有上边距(margin-top)，将内容与导航栏分开 -->
+        <div class="row"> <!-- Bootstrap行，用于创建水平分组 -->
+            <!-- 侧边栏导航 - 在中等屏幕及以上占据3/12列宽度 -->
+            <div class="col-md-3">
+                <div class="list-group"> <!-- Bootstrap列表组组件，用于垂直导航 -->
+                    <!-- 首页链接，使用Jinja2条件表达式检查当前路径是否为首页，如果是则添加active类 -->
+                    <a href="/" class="list-group-item list-group-item-action {% if request.path == '/' %}active{% endif %}">
+                        <i class='bx bx-home'></i> {{ t.home }}
+                    </a>
+                    {% for step in range(1, 7) %}
+                        <a href="/step/{{ step }}" class="list-group-item list-group-item-action {% if request.path == url_for('step', step=step) %}active{% endif %}">
+                            <i class='bx bx-list-check'></i> {{ t.step }} {{ step }}: {{ t['step_' ~ step ~ '_name'] }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- 主要内容区域 - 在中等屏幕及以上占据9/12列宽度 -->
+            <div class="col-md-9">
+                <!-- 错误消息显示区域 - 如果存在错误，则显示可关闭的警告框 -->
+                {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class='bx bx-error-circle'></i> {{ error }} <!-- 错误图标和消息 -->
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> <!-- 关闭按钮 -->
+                    </div>
+                {% endif %}
+                <!-- 内容卡片 - 主要内容的容器 -->
+                <div class="card">
+                    <div class="card-body">
+                        {% block content %}{% endblock %} <!-- Jinja2内容块，子模板将内容插入此处 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回顶部按钮 - 悬浮按钮，允许用户快速回到页面顶部 -->
+    <button id="backToTop" class="back-to-top" title="返回顶部">↑</button>
+    
+    <script>
+        // 返回顶部按钮功能
+        const backToTopButton = document.getElementById('backToTop'); // 获取按钮元素
+        
+        // 监听窗口滚动事件
+        window.addEventListener('scroll', () => {
+            // 当页面滚动超过250像素时显示按钮，否则隐藏
+            if (window.pageYOffset > 250) {
+                backToTopButton.classList.add('show'); // 添加show类显示按钮
+            } else {
+                backToTopButton.classList.remove('show'); // 移除show类隐藏按钮
+            }
+        });
+        
+        // 点击按钮时滚动回顶部
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,                 // 滚动到顶部(0像素)
+                behavior: 'smooth'      // 使用平滑滚动效果
+            });
+        });
+        // 设置语言
+        function setLanguage(lang) {
+            localStorage.setItem('language', lang);
+            location.reload();
+        }
+
+        // 检测浏览器语言并设置默认语言
+        (function() {
+            const savedLanguage = localStorage.getItem('language');
+            const browserLanguage = navigator.language || navigator.userLanguage;
+            const defaultLanguage = savedLanguage || (browserLanguage.includes('zh') ? 'zh-CN' : 'en-US');
+            document.documentElement.lang = defaultLanguage;
+        })();
+    </script>
+    
+    <!-- 外部JavaScript库 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap 5 JS库 -->
+    
+    <!-- Jinja2脚本块，允许子模板插入自定义脚本 -->
+    {% block scripts %}{% endblock %}
+    
+    <!-- 额外的JavaScript块，为特定页面提供更多灵活性 -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+<!-- 
+base.html是一个模板文件，使用Jinja2模板引擎，为整个STPA分析工具网站提供基本布局和样式。
+它定义了一个响应式设计，包含以下主要组件：
+1. 导航栏：显示网站标题和标志
+2. 侧边栏：提供STPA分析步骤的导航链接
+3. 主内容区域：通过内容块动态插入各页面的特定内容
+4. 返回顶部按钮：改善长页面的用户体验
+该模板使用Bootstrap 5框架实现响应式设计，并通过CSS变量和自定义样式提供一致的视觉体验。
+-->

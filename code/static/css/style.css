@@ -1,0 +1,156 @@
+body {
+    background-color: #f8f9fa;
+}
+#reflink button {
+    background-color: #b8c5d3;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#reflink button:hover {
+    background-color: #0056b3;
+}
+#language-switch button {
+    background-color: #b8c5d3;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#language-switch button:hover {
+    background-color: #0056b3;
+}
+
+.container {
+    max-width: 1800px;
+}
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+textarea {
+    resize: vertical;
+}
+#diagram svg {
+    width: 100%;
+    height: auto;
+}
+.table tr {
+    cursor: pointer;
+}
+.list-group-item.active {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+/* 表格优化样式 */
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+.table {
+    width: 100%;
+    min-width: 1200px; /* 确保表格足够宽以容纳 11 列 */
+    font-size: 0.9rem; /* 减小字体以适应更多列 */
+    border-collapse: collapse;
+}
+.table th, .table td {
+    white-space: normal; /* 允许内容自动换行 */
+    word-wrap: break-word; /* 确保长单词也能换行 */
+    padding: 8px 12px; /* 增加内边距以提高可读性 */
+    border: 1px solid #dee2e6; /* 保持边框清晰 */
+    vertical-align: middle; /* 垂直居中 */
+}
+.table th {
+    background-color: #e9ecef; /* 表头背景色 */
+    font-weight: 600; /* 表头加粗 */
+    position: sticky; /* 固定表头 */
+    top: 0;
+    z-index: 1;
+}
+.table tbody tr:hover {
+    background-color: #f1f3f5; /* 行悬停效果 */
+}
+.table td {
+    max-width: 250px; /* 增加最大宽度以容纳更多内容 */
+    min-width: 100px; /* 确保单元格有最小宽度 */
+    overflow: visible; /* 允许内容溢出显示 */
+}
+/* 为特定列设置更宽的宽度 */
+.table th:nth-child(2), .table td:nth-child(2), /* 误用场景 */
+.table th:nth-child(3), .table td:nth-child(3), /* 误用场景相关影响 */
+.table th:nth-child(8), .table td:nth-child(8), /* 误用过程 */
+.table th:nth-child(9), .table td:nth-child(9), /* 引导词 */
+.table th:nth-child(10), .table td:nth-child(10) /* 致因因素 */ {
+    min-width: 200px; /* 为内容较长的列设置更大的最小宽度 */
+}
+/* 悬停显示完整内容 */
+.table td:hover {
+    position: relative;
+}
+.table td:hover::after {
+    content: attr(data-fulltext); /* 使用 data-fulltext 显示完整内容 */
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 10;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    padding: 5px;
+    white-space: normal;
+    max-width: 300px;
+    display: none; /* 默认隐藏，需 JS 启用 */
+}
+/* 步骤二添加选项样式 */
+.badge.bg-info {
+    background-color: #17a2b8 !important; /* 自定义条目的独特颜色 */
+}
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.8rem;
+        min-width: 1000px;
+    }
+    .table th, .table td {
+        padding: 6px 8px; /* 小屏幕上减小内边距 */
+    }
+    .dropdown-item {
+        font-size: 0.8rem; /* 减小字体大小以适应小屏幕 */
+        padding: 6px 8px; /* 减小内边距以适应小屏幕 */
+    }
+}
+/* 返回顶部按钮样式 */
+.back-to-top {
+    position: fixed;
+    bottom: 40px;
+    left: 50px;
+    width: 50px;
+    height: 50px;
+    background-color: #b6d7df;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    font-size: 40px;
+    text-align: center;
+    line-height: 40px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+    z-index: 1000;
+}
+
+.back-to-top:hover {
+    background-color: #45a049;
+}
+
+.back-to-top.show {
+    display: block;
+}
